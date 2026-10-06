@@ -2,7 +2,7 @@ export default function ResolutionView() {
   return (
     <div className="flex flex-col items-center justify-center h-full bg-slate-950 text-white p-6">
       <div className="w-full max-w-4xl bg-slate-900 p-8 rounded-lg border border-slate-800">
-        <h1 className="text-3xl font-bold text-center mb-8">Result</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">Result (Example)</h1>
         
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div className="bg-slate-800 p-6 rounded border-t-4 border-blue-500">
