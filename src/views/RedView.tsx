@@ -18,7 +18,7 @@ export default function RedView() {
         <div className="flex-1 overflow-y-auto">
           <h2 className="text-lg font-semibold mb-3">Attack Catalogue</h2>
           <div className="p-3 bg-slate-900 rounded border border-slate-700 mb-2 hover:border-red-500 cursor-pointer transition-colors">
-            <div className="font-medium text-red-100">SQL Injection (Exemple)</div>
+            <div className="font-medium text-red-100">SQL Injection (Example)</div>
             <div className="text-sm text-slate-400">Target: Database</div>
           </div>
         </div>
