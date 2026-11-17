@@ -12,7 +12,6 @@ function createInitialGame(): GameState {
     strideLocked: false,
     strideRedoUsed: false,
     identifiedVulnerabilities: [],
-    mitigationNotes: {},
     selectedDefenses: [],
     discoveredAssets: [],
     discoveredVulnerabilities: [],
@@ -83,7 +82,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       strideLocked: false,
       strideRedoUsed: true,
       identifiedVulnerabilities: [],
-      mitigationNotes: {},
       selectedDefenses: [],
     }))
     return true
@@ -101,14 +99,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       || current.identifiedVulnerabilities.includes(vulnerabilityId)
       ? current
       : { ...current, identifiedVulnerabilities: [...current.identifiedVulnerabilities, vulnerabilityId] })
-  }
-
-  function saveMitigation(targetId: StrideTargetId, category: StrideCategory, note: string) {
-    const key = `${targetId}:${category}`
-    setGame((current) => current.phase !== 'preparation' || current.stage !== 'blue'
-      || current.strideAssessments[key] !== 'threat'
-      ? current
-      : { ...current, mitigationNotes: { ...current.mitigationNotes, [key]: note } })
   }
 
   function toggleDefense(defenseId: DefenseId) {
@@ -201,7 +191,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       confirmStride,
       redoStride,
       confirmVulnerability,
-      saveMitigation,
       toggleDefense,
       lockDefenses,
       discoverAssets,

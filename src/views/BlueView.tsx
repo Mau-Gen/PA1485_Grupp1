@@ -6,7 +6,7 @@ import {
   defenseBudget,
   defenses,
   strideRedoPenalty,
-  processNotes,
+  componentNotes,
   strideCategories,
   strideTargets,
   trustBoundaries,
@@ -16,17 +16,17 @@ import {
 } from '../game/gameData'
 
 const diagramPoints: Record<AssetId, { left: string; top: string }> = {
-  checkout: { left: '34.5%', top: '50%' },
-  'cold-chain': { left: '52%', top: '20.8%' },
-  inventory: { left: '59%', top: '62.5%' },
-  loyalty: { left: '85%', top: '62.5%' },
+  checkout: { left: '41%', top: '43.3%' },
+  'cold-chain': { left: '59%', top: '14.5%' },
+  inventory: { left: '65.5%', top: '54.2%' },
+  loyalty: { left: '93%', top: '55%' },
 }
 
 const boundaryPoints: Record<BoundaryId, { left: string; top: string }> = {
   'customer-checkout': { left: '22%', top: '50%' },
   'payment-provider': { left: '69%', top: '30%' },
   'sensor-network': { left: '39%', top: '18%' },
-  'store-cloud': { left: '72%', top: '62.5%' },
+  'store-cloud': { left: '72%', top: '68.3%' },
 }
 
 export default function BlueView() {
@@ -42,13 +42,12 @@ export default function BlueView() {
     confirmStride,
     redoStride,
     confirmVulnerability,
-    saveMitigation,
     toggleDefense,
     lockDefenses,
   } = useGame()
   const [activeNote, setActiveNote] = useState<AssetId | null>(null)
   const [activeBoundary, setActiveBoundary] = useState<BoundaryId | null>(null)
-  const [feedback, setFeedback] = useState('READ THE COMPANY BRIEF, THEN PLACE ITS PROCESSES')
+  const [feedback, setFeedback] = useState('READ THE COMPANY BRIEF, THEN PLACE ITS COMPONENTS')
 
   function handleIdentifyAsset(assetId: AssetId) {
     const asset = assets.find(({ id }) => id === assetId)
@@ -56,7 +55,7 @@ export default function BlueView() {
     if (game.identifiedAssets.includes(assetId)) {
       setFeedback(`${asset.name.toUpperCase()} ALREADY ON THE DFD`)
     } else if (activeNote !== assetId) {
-      setFeedback('SELECT THE MATCHING PROCESS IN THE COMPANY BRIEF FIRST')
+      setFeedback('SELECT THE MATCHING COMPONENT IN THE COMPANY BRIEF FIRST')
     } else {
       identifyAsset(assetId)
       setActiveNote(null)
@@ -74,7 +73,7 @@ export default function BlueView() {
     } else {
       identifyBoundary(boundaryId)
       setActiveBoundary(null)
-      setFeedback(`${boundary.marker} DRAWN ON THE DFD`)
+      setFeedback(`${boundary.marker} CROSSING DRAWN`)
     }
   }
 
@@ -82,16 +81,6 @@ export default function BlueView() {
     if (lockDefenses()) navigate('/red')
   }
 
-  const locatedStrideThreats = Object.entries(game.strideAssessments)
-    .filter(([, assessment]) => assessment === 'threat')
-    .map(([key]) => {
-      const [targetId, category] = key.split(':')
-      return {
-        key,
-        target: strideTargets.find(({ id }) => id === targetId),
-        category,
-      }
-    })
   const detectedVulnerabilities = vulnerabilities.filter(({ assetId, boundaryId, category }) => {
     return game.strideAssessments[`${assetId}:${category}`] === 'threat'
       && game.strideAssessments[`${boundaryId}:${category}`] === 'threat'
@@ -106,7 +95,7 @@ export default function BlueView() {
         </div>
         <div className="flex items-center gap-4 font-mono">
           <div className="text-right">
-            <p className="text-[10px] text-[#b9a879]">PROCESSES</p>
+            <p className="text-[10px] text-[#b9a879]">COMPONENTS</p>
             <p className="text-lg font-bold text-[#f2e8ca]">{game.identifiedAssets.length}<span className="text-[#9ca79a]"> / {assets.length}</span></p>
           </div>
           <div className="border-l border-[#697468] pl-4 text-right">
@@ -131,17 +120,17 @@ export default function BlueView() {
                 Northstar is a neighborhood supermarket with staffed and self-checkout lanes, refrigerated food cases, a supplier network, and a customer loyalty program. One store connects to a head-office network for purchasing and customer services. The store manager has asked for a data-flow diagram before a security review.
               </p>
               <p className="mt-2 text-sm leading-6">
-                Use the process notes to decompose the store into its main processes. Add each process to the blank DFD, draw the trust boundaries where information crosses between people, devices, networks, or organizations, then assess every process and boundary with STRIDE.
+                Use the component notes to decompose the store into its main components. Add each component to the blank DFD, draw the trust boundaries where information crosses between people, devices, networks, or organizations, then assess every component and boundary with STRIDE.
               </p>
             </article>
 
             <aside className="border border-[#87968c] bg-[#202d28]/95 p-4">
               <p className="font-mono text-[9px] tracking-[0.15em] text-[#c7b78b]">WORKSHOP CHECKLIST</p>
               <ol className="mt-3 space-y-2 text-xs leading-5 text-[#d0d8ce]">
-                <li><span className="font-mono text-[#f0dca8]">01</span> Decompose the business into four DFD processes.</li>
+                <li><span className="font-mono text-[#f0dca8]">01</span> Decompose the business into four DFD components.</li>
                 <li><span className="font-mono text-[#f0dca8]">02</span> Draw all four trust boundaries on the diagram.</li>
-                <li><span className="font-mono text-[#f0dca8]">03</span> Assess each STRIDE category for every process and boundary.</li>
-                <li><span className="font-mono text-[#f0dca8]">04</span> Write mitigations, then choose which to fund.</li>
+                <li><span className="font-mono text-[#f0dca8]">03</span> Assess each STRIDE category for every component and boundary.</li>
+                <li><span className="font-mono text-[#f0dca8]">04</span> Choose which mitigations to fund.</li>
               </ol>
             </aside>
           </section>
@@ -151,13 +140,13 @@ export default function BlueView() {
               <section className="border border-[#87968c] bg-[#202d28]/90 p-4">
                 <div className="mb-3 flex items-end justify-between border-b border-[#5f7065] pb-2">
                   <div>
-                    <p className="font-mono text-[9px] tracking-[0.15em] text-[#c7b78b]">PROCESS NOTES</p>
+                    <p className="font-mono text-[9px] tracking-[0.15em] text-[#c7b78b]">COMPONENT NOTES</p>
                     <h2 className="text-sm font-bold text-[#f0e8d3]">Decompose the store</h2>
                   </div>
                   <span className="font-mono text-[10px] text-[#c7b78b]">{game.identifiedAssets.length} / {assets.length}</span>
                 </div>
                 <div className="space-y-2">
-                  {processNotes.map((note, index) => {
+                  {componentNotes.map((note) => {
                     const isIdentified = game.identifiedAssets.includes(note.assetId)
                     const isActive = activeNote === note.assetId
                     const asset = assets.find(({ id }) => id === note.assetId)
@@ -168,7 +157,7 @@ export default function BlueView() {
                         onClick={() => {
                           if (isIdentified) return
                           setActiveNote(isActive ? null : note.assetId)
-                          setFeedback(isActive ? 'CHOOSE A PROCESS NOTE TO PLACE' : `PROCESS NOTE 0${index + 1} SELECTED · PLACE ${asset?.marker}`)
+                          setFeedback(isActive ? 'CHOOSE A COMPONENT NOTE TO PLACE' : `${note.marker} SELECTED · FIND ITS DFD LOCATION`)
                         }}
                         disabled={isIdentified}
                         aria-pressed={isActive}
@@ -176,7 +165,7 @@ export default function BlueView() {
                       >
                         <span className="flex items-center justify-between gap-2 font-mono text-[9px] font-bold tracking-[0.1em] text-[#b9a879]">
                           <span>{note.subject}</span>
-                          <span>{isIdentified ? 'PLACED' : `P${index + 1}`}</span>
+                          <span>{isIdentified ? 'PLACED' : note.marker}</span>
                         </span>
                         <span className={`mt-2 block text-xs leading-5 ${isIdentified || isActive ? '' : 'text-[#d0d8ce]'}`}>{note.note}</span>
                         {isIdentified && <span className="mt-2 block font-mono text-[9px] font-bold uppercase text-[#3d6947]">{asset?.name} added to DFD</span>}
@@ -205,7 +194,7 @@ export default function BlueView() {
                         onClick={() => {
                           if (isDrawn) return
                           setActiveBoundary(isActive ? null : boundary.id)
-                          setFeedback(isActive ? 'SELECT A BOUNDARY NOTE BEFORE DRAWING' : `${boundary.marker} SELECTED · MARK ITS CROSSING ON THE DFD`)
+                          setFeedback(isActive ? 'SELECT A BOUNDARY NOTE BEFORE DRAWING' : `${boundary.marker} SELECTED · FIND ITS DFD CROSSING`)
                         }}
                         disabled={isDrawn}
                         aria-pressed={isActive}
@@ -239,22 +228,22 @@ export default function BlueView() {
                         </marker>
                       </defs>
                       <rect width="1000" height="600" fill="url(#dfd-grid)" />
-                      <text x="38" y="45" fill="#7a7b6d" fontSize="15" fontFamily="monospace">CUSTOMERS / EXTERNAL SERVICES</text>
-                      <text x="255" y="45" fill="#7a7b6d" fontSize="15" fontFamily="monospace">NORTHSTAR MARKET SYSTEMS</text>
+                      <text x="38" y="45" fill="#7a7b6d" fontSize="12" fontFamily="monospace">CUSTOMERS / EXTERNAL SERVICES</text>
+                      <text x="330" y="45" fill="#7a7b6d" fontSize="12" fontFamily="monospace">NORTHSTAR MARKET SYSTEMS</text>
                       <circle cx="125" cy="300" r="55" fill="#f5f1e5" stroke="#586b60" strokeWidth="3" />
                       <text x="125" y="305" textAnchor="middle" fill="#37473f" fontSize="14" fontFamily="monospace">CUSTOMER</text>
                       <rect x="260" y="245" width="170" height="110" rx="9" fill="#f8f4e8" stroke="#586b60" strokeWidth="3" />
-                      <text x="345" y="290" textAnchor="middle" fill="#37473f" fontSize="13" fontFamily="monospace">{game.identifiedAssets.includes('checkout') ? 'CHECKOUT' : 'PROCESS 1'}</text>
-                      <text x="345" y="316" textAnchor="middle" fill="#657166" fontSize="11" fontFamily="monospace">{game.identifiedAssets.includes('checkout') ? assets[0].address : 'PLACE PROCESS'}</text>
+                      <text x="345" y="290" textAnchor="middle" fill="#37473f" fontSize="10" fontFamily="monospace">{game.identifiedAssets.includes('checkout') ? assets[0].name.toUpperCase() : 'COMPONENT 1'}</text>
+                      <text x="345" y="316" textAnchor="middle" fill="#657166" fontSize="11" fontFamily="monospace">{game.identifiedAssets.includes('checkout') ? assets[0].address : 'PLACE COMPONENT'}</text>
                       <rect x="430" y="70" width="180" height="110" rx="9" fill="#f8f4e8" stroke="#586b60" strokeWidth="3" />
-                      <text x="520" y="115" textAnchor="middle" fill="#37473f" fontSize="13" fontFamily="monospace">{game.identifiedAssets.includes('cold-chain') ? 'COLD-CHAIN' : 'PROCESS 2'}</text>
-                      <text x="520" y="141" textAnchor="middle" fill="#657166" fontSize="11" fontFamily="monospace">{game.identifiedAssets.includes('cold-chain') ? assets[1].address : 'PLACE PROCESS'}</text>
+                      <text x="520" y="115" textAnchor="middle" fill="#37473f" fontSize="10" fontFamily="monospace">{game.identifiedAssets.includes('cold-chain') ? assets[1].name.toUpperCase() : 'COMPONENT 2'}</text>
+                      <text x="520" y="141" textAnchor="middle" fill="#657166" fontSize="11" fontFamily="monospace">{game.identifiedAssets.includes('cold-chain') ? assets[1].address : 'PLACE COMPONENT'}</text>
                       <rect x="500" y="320" width="180" height="110" rx="9" fill="#f8f4e8" stroke="#586b60" strokeWidth="3" />
-                      <text x="590" y="365" textAnchor="middle" fill="#37473f" fontSize="13" fontFamily="monospace">{game.identifiedAssets.includes('inventory') ? 'STOCK' : 'PROCESS 3'}</text>
-                      <text x="590" y="391" textAnchor="middle" fill="#657166" fontSize="11" fontFamily="monospace">{game.identifiedAssets.includes('inventory') ? assets[2].address : 'PLACE PROCESS'}</text>
+                      <text x="590" y="365" textAnchor="middle" fill="#37473f" fontSize="10" fontFamily="monospace">{game.identifiedAssets.includes('inventory') ? assets[2].name.toUpperCase() : 'COMPONENT 3'}</text>
+                      <text x="590" y="391" textAnchor="middle" fill="#657166" fontSize="11" fontFamily="monospace">{game.identifiedAssets.includes('inventory') ? assets[2].address : 'PLACE COMPONENT'}</text>
                       <path d="M760 320 H940 V430 H760 Z" fill="#f8f4e8" stroke="#586b60" strokeWidth="3" />
                       <path d="M760 337 H940 M760 413 H940" stroke="#586b60" strokeWidth="2" />
-                      <text x="850" y="375" textAnchor="middle" fill="#37473f" fontSize="13" fontFamily="monospace">{game.identifiedAssets.includes('loyalty') ? 'LOYALTY DATA' : 'DATA STORE 1'}</text>
+                      <text x="850" y="375" textAnchor="middle" fill="#37473f" fontSize="9" fontFamily="monospace">{game.identifiedAssets.includes('loyalty') ? assets[3].name.toUpperCase() : 'COMPONENT 4'}</text>
                       <text x="850" y="397" textAnchor="middle" fill="#657166" fontSize="10" fontFamily="monospace">MEMBER / PURCHASE RECORDS</text>
                       <rect x="770" y="85" width="160" height="75" rx="9" fill="#f5f1e5" stroke="#8b8067" strokeWidth="2" />
                       <text x="850" y="117" textAnchor="middle" fill="#5b594c" fontSize="12" fontFamily="monospace">PAYMENT PROVIDER</text>
@@ -265,8 +254,8 @@ export default function BlueView() {
                       <path d="M345 245 V215 H520 V180" fill="none" stroke="#7d8174" strokeWidth="2" strokeDasharray="7 6" markerEnd="url(#dfd-arrow)" />
                       <path d="M430 260 L770 145" fill="none" stroke="#586b60" strokeWidth="2" markerEnd="url(#dfd-arrow)" />
                       <path d="M320 125 H430" fill="none" stroke="#586b60" strokeWidth="2" markerEnd="url(#dfd-arrow)" />
-                      <text x="190" y="286" fill="#73796e" fontSize="11" fontFamily="monospace">basket / payment</text>
-                      <text x="685" y="360" fill="#73796e" fontSize="11" fontFamily="monospace">member records</text>
+                      <text x="190" y="232" fill="#73796e" fontSize="11" fontFamily="monospace">basket / payment</text>
+                      <text x="685" y="460" fill="#73796e" fontSize="11" fontFamily="monospace">member records</text>
                       <path d="M180 300 H260" fill="none" stroke="#aa674e" strokeWidth="5" strokeDasharray="3 7" opacity={game.identifiedBoundaries.includes('customer-checkout') ? 1 : 0} />
                       <path d="M430 260 L770 145" fill="none" stroke="#aa674e" strokeWidth="5" strokeDasharray="3 7" opacity={game.identifiedBoundaries.includes('payment-provider') ? 1 : 0} />
                       <path d="M320 125 H430" fill="none" stroke="#aa674e" strokeWidth="5" strokeDasharray="3 7" opacity={game.identifiedBoundaries.includes('sensor-network') ? 1 : 0} />
@@ -282,11 +271,11 @@ export default function BlueView() {
                           type="button"
                           onClick={() => handleIdentifyAsset(asset.id)}
                           style={{ left: point.left, top: point.top }}
-                          aria-label={isIdentified ? `${asset.name}, placed on DFD` : `DFD process location ${asset.marker}`}
+                          aria-label={isIdentified ? `${asset.name}, placed on DFD` : `DFD component location ${asset.location}`}
                           className="group absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#18251f]"
                         >
                           <span className={`h-3.5 w-3.5 rounded-full border-2 border-white transition-all ${isIdentified ? 'scale-110 bg-[#4f985e] ring-4 ring-[#4f985e]/30 shadow-[0_0_14px_#5cac69]' : 'bg-[#a55c43] shadow-[0_1px_5px_#333]'}`} />
-                          <span className="pointer-events-none absolute left-[calc(100%+2px)] top-1/2 -translate-y-1/2 whitespace-nowrap border border-[#bcb6a4] bg-[#f3eedf]/95 px-1 py-0.5 font-mono text-[9px] font-bold text-[#37473f] shadow-sm">{isIdentified ? '✓' : asset.marker}</span>
+                          <span className="pointer-events-none absolute left-[calc(100%+2px)] top-1/2 -translate-y-1/2 whitespace-nowrap border border-[#bcb6a4] bg-[#f3eedf]/95 px-1 py-0.5 font-mono text-[9px] font-bold text-[#37473f] shadow-sm">{isIdentified ? '✓' : asset.location}</span>
                         </button>
                       )
                     })}
@@ -300,10 +289,10 @@ export default function BlueView() {
                           type="button"
                           onClick={() => handleIdentifyBoundary(boundary.id)}
                           style={{ left: point.left, top: point.top }}
-                          aria-label={`${boundary.marker} ${boundary.name}${isDrawn ? ', drawn' : ', draw trust boundary'}`}
+                          aria-label={`DFD trust boundary location ${boundary.location}${isDrawn ? ', drawn' : ''}`}
                           className="absolute z-20 flex h-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center px-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#18251f]"
                         >
-                          <span className={`whitespace-nowrap border px-1 py-0.5 font-mono text-[9px] font-bold shadow-sm ${isDrawn ? 'border-[#3d6947] bg-[#d9e0c8] text-[#3d6947]' : 'border-[#a55c43] bg-[#fff1b8] text-[#704432]'}`}>{isDrawn ? `✓ ${boundary.marker}` : boundary.marker}</span>
+                          <span className={`absolute bottom-[calc(100%+2px)] left-1/2 -translate-x-1/2 whitespace-nowrap border px-1 py-0.5 font-mono text-[9px] font-bold shadow-sm ${isDrawn ? 'border-[#3d6947] bg-[#d9e0c8] text-[#3d6947]' : 'border-[#a55c43] bg-[#fff1b8] text-[#704432]'}`}>{isDrawn ? `✓ ${boundary.location}` : boundary.location}</span>
                         </button>
                       )
                     })}
@@ -311,7 +300,7 @@ export default function BlueView() {
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3 px-2 font-mono text-[9px] text-[#f0dcb4] sm:px-4 sm:text-[10px]">
                   <span className="truncate">{feedback}</span>
-                  <span className="shrink-0">{activeNote ? 'PROCESS SELECTED' : activeBoundary ? 'BOUNDARY SELECTED' : 'WORKING COPY'}</span>
+                  <span className="shrink-0">{activeNote ? 'COMPONENT SELECTED' : activeBoundary ? 'BOUNDARY SELECTED' : 'WORKING COPY'}</span>
                 </div>
               </div>
 
@@ -319,13 +308,13 @@ export default function BlueView() {
                 <div className="mb-3 flex flex-wrap items-end justify-between gap-2 border-b border-[#5f7065] pb-2">
                   <div>
                     <p className="font-mono text-[9px] tracking-[0.15em] text-[#c7b78b]">STRIDE THREAT MODEL</p>
-                    <h2 className="text-sm font-bold text-[#f0e8d3]">{game.strideLocked ? 'Assessment locked' : 'Assess every process and boundary'}</h2>
+                    <h2 className="text-sm font-bold text-[#f0e8d3]">{game.strideLocked ? 'Assessment locked' : 'Assess every component and boundary'}</h2>
                   </div>
                   <p className="text-[10px] text-[#c4cec4]">{game.strideLocked ? 'Your selections are locked. Confirmed threats are available in the risk review below.' : 'Choose Threat or No threat for all six categories on every row.'}</p>
                 </div>
                 <div className="grid gap-3 xl:grid-cols-2">
                   {strideTargets.map((target) => {
-                    const located = target.kind === 'PROCESS'
+                    const located = target.kind === 'COMPONENT'
                       ? game.identifiedAssets.includes(target.id as AssetId)
                       : game.identifiedBoundaries.includes(target.id as BoundaryId)
                     const reviewedCount = strideCategories.filter(({ id }) => Boolean(game.strideAssessments[`${target.id}:${id}`])).length
@@ -402,7 +391,7 @@ export default function BlueView() {
                     </button>
                   )}
                   {!game.strideLocked && (
-                    <p className="mt-2 text-[10px] leading-4 text-[#b6c0b3]">Place all processes and boundaries and choose a response for every STRIDE category before confirming. The risk review will open after the choices are locked.</p>
+                    <p className="mt-2 text-[10px] leading-4 text-[#b6c0b3]">Place all components and boundaries and choose a response for every STRIDE category before confirming. The risk review will open after the choices are locked.</p>
                   )}
                 </div>
               </section>
@@ -449,7 +438,7 @@ export default function BlueView() {
                 )}
                 {game.strideLocked && detectedVulnerabilities.length < vulnerabilities.length && !game.strideRedoUsed && (
                   <div className="mt-4 border-t border-[#5f7065] pt-4">
-                    <p className="text-xs leading-5 text-[#d0d8ce]">Some scenario risks were not surfaced. You may redo the STRIDE table once; doing so clears its choices, risk confirmations, notes, and selected mitigations.</p>
+                    <p className="text-xs leading-5 text-[#d0d8ce]">Some scenario risks were not surfaced. You may redo the STRIDE table once; doing so clears its choices, risk confirmations, and selected mitigations.</p>
                     <button
                       type="button"
                       onClick={redoStride}
@@ -457,39 +446,6 @@ export default function BlueView() {
                     >
                       REDO STRIDE REVIEW · DEDUCT {strideRedoPenalty} DEFENSE POINTS
                     </button>
-                  </div>
-                )}
-              </section>
-
-              <section className="mt-5 border border-[#87968c] bg-[#202d28]/90 p-4">
-                <div className="mb-3 border-b border-[#5f7065] pb-2">
-                  <p className="font-mono text-[9px] tracking-[0.15em] text-[#c7b78b]">MITIGATION WORKSHEET</p>
-                  <h2 className="text-sm font-bold text-[#f0e8d3]">Write a response for each identified STRIDE threat</h2>
-                  <p className="mt-1 text-[10px] leading-4 text-[#b6c0b3]">Optional exercise notes. You can leave any or all responses blank; choose funded mitigations in the budget section below.</p>
-                </div>
-                {locatedStrideThreats.length === 0 ? (
-                  <p className="text-xs leading-5 text-[#b6c0b3]">Mark a STRIDE category as a threat to add it to this worksheet.</p>
-                ) : (
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {locatedStrideThreats.map(({ key, target, category }) => (
-                      <label key={key} className="block border border-[#58685f] bg-[#17231f] p-3">
-                        <span className="font-mono text-[9px] font-bold text-[#e3a99a]">{target?.kind} · {target?.name} · {category}</span>
-                        <span className="mt-1 block text-[10px] leading-4 text-[#b6c0b3]">Describe a control that would reduce this risk.</span>
-                        <textarea
-                          value={game.mitigationNotes[key] ?? ''}
-                          onChange={(event) => {
-                            if (target) {
-                              const categoryId = strideCategories.find(({ id }) => id === category)?.id
-                              if (categoryId) saveMitigation(target.id, categoryId, event.target.value)
-                            }
-                          }}
-                          disabled={!target}
-                          rows={2}
-                          className="mt-2 w-full resize-y border border-[#58685f] bg-[#101a16] p-2 text-xs text-[#f1ead8] outline-none focus:border-[#d6c18d] disabled:opacity-50"
-                          placeholder="e.g. Require signed sensor readings and alert on unrecognized devices."
-                        />
-                      </label>
-                    ))}
                   </div>
                 )}
               </section>
@@ -540,7 +496,7 @@ export default function BlueView() {
                     : 'CONFIRM FUNDED MITIGATIONS AND PASS TO RED TEAM'}
                 </button>
                 <p className="mt-2 text-[10px] leading-4 text-[#b6c0b3]">
-                  Complete the process and boundary diagram, lock all STRIDE choices, confirm the risks you found, and select funded mitigations within your {game.strideRedoUsed ? defenseBudget - strideRedoPenalty : defenseBudget}-point budget. You may proceed without finding every risk; written mitigation notes are optional.
+                  Complete the component and boundary diagram, lock all STRIDE choices, confirm the risks you found, and select funded mitigations within your {game.strideRedoUsed ? defenseBudget - strideRedoPenalty : defenseBudget}-point budget. You may proceed without finding every risk.
                 </p>
               </section>
             </section>

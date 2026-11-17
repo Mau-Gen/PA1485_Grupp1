@@ -18,7 +18,6 @@ export type GameState = {
   strideLocked: boolean
   strideRedoUsed: boolean
   identifiedVulnerabilities: VulnerabilityId[]
-  mitigationNotes: Record<string, string>
   selectedDefenses: DefenseId[]
   discoveredAssets: AssetId[]
   discoveredVulnerabilities: VulnerabilityId[]
@@ -37,7 +36,6 @@ export type GameContextValue = {
   confirmStride: () => boolean
   redoStride: () => boolean
   confirmVulnerability: (vulnerabilityId: VulnerabilityId) => void
-  saveMitigation: (targetId: StrideTargetId, category: StrideCategory, note: string) => void
   toggleDefense: (defenseId: DefenseId) => void
   lockDefenses: () => boolean
   discoverAssets: () => void

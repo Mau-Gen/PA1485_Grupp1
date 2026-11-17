@@ -13,10 +13,10 @@ export default function RulesView() {
           <section>
             <h2 className="text-xl font-bold text-blue-400 mb-2">Blue Team (Defence)</h2>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Read the Northstar Market company brief and place its checkout, cold-chain, stock, and loyalty processes in the DFD.</li>
+              <li>Read the Northstar Market company brief and place its checkout, cold-chain, stock, and loyalty components in the DFD.</li>
               <li>Draw the trust boundaries at the customer, payment provider, sensor network, and head-office connections.</li>
-              <li>Assess all six STRIDE categories for every process and trust boundary, then confirm to lock your choices and reveal the risks they surface. If risks are missed, you may redo the STRIDE table once at a cost of 2 defense points.</li>
-              <li>You may write mitigation notes for identified threats, then use the limited defense budget to confirm which catalog mitigations to fund. Written notes are optional.</li>
+              <li>Assess all six STRIDE categories for every component and trust boundary, then confirm to lock your choices and reveal the risks they surface. If risks are missed, you may redo the STRIDE table once at a cost of 2 defense points.</li>
+              <li>Use the limited defense budget to confirm which catalog mitigations to fund.</li>
             </ul>
           </section>
 

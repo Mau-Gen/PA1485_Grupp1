@@ -1,17 +1,17 @@
 export const assets = [
-  { id: 'checkout', name: 'Checkout & payment', address: '10.24.1.20', host: 'pos-gateway', service: 'Point-of-sale register and payment orchestration', marker: 'P1' },
-  { id: 'cold-chain', name: 'Cold-chain control', address: '10.24.3.15', host: 'cold-chain-svc', service: 'Refrigerator sensors and temperature alarms', marker: 'P2' },
-  { id: 'inventory', name: 'Stock & replenishment', address: '10.24.2.30', host: 'stock-svc', service: 'Stock counts, deliveries, and supplier orders', marker: 'P3' },
-  { id: 'loyalty', name: 'Loyalty & customer records', address: '10.24.2.50', host: 'loyalty-db', service: 'Customer profiles and purchase history', marker: 'D1' },
+  { id: 'checkout', name: 'Checkout & payment', address: '10.24.1.20', host: 'pos-gateway', service: 'Point-of-sale register and payment orchestration', location: 'L3' },
+  { id: 'cold-chain', name: 'Cold-chain control', address: '10.24.3.15', host: 'cold-chain-svc', service: 'Refrigerator sensors and temperature alarms', location: 'L1' },
+  { id: 'inventory', name: 'Stock & replenishment', address: '10.24.2.30', host: 'stock-svc', service: 'Stock counts, deliveries, and supplier orders', location: 'L4' },
+  { id: 'loyalty', name: 'Loyalty & customer records', address: '10.24.2.50', host: 'loyalty-db', service: 'Customer profiles and purchase history', location: 'L2' },
 ] as const
 
 export type AssetId = (typeof assets)[number]['id']
 
 export const trustBoundaries = [
-  { id: 'customer-checkout', name: 'Customer ↔ checkout', detail: 'Customer-facing self-checkout terminals connect to the store POS network.', marker: 'TB1' },
-  { id: 'payment-provider', name: 'Checkout ↔ payment provider', detail: 'Card authorization leaves the supermarket network for an external payment processor.', marker: 'TB2' },
-  { id: 'sensor-network', name: 'Sensor network ↔ cold-chain control', detail: 'Wireless refrigerator sensors report into the control service.', marker: 'TB3' },
-  { id: 'store-cloud', name: 'Store ↔ head office', detail: 'Stock and loyalty data move between store systems and the head-office network.', marker: 'TB4' },
+  { id: 'customer-checkout', name: 'Customer ↔ checkout', detail: 'Customer-facing self-checkout terminals connect to the store POS network.', marker: 'TB1', location: 'X2' },
+  { id: 'payment-provider', name: 'Checkout ↔ payment provider', detail: 'Card authorization leaves the supermarket network for an external payment processor.', marker: 'TB2', location: 'X4' },
+  { id: 'sensor-network', name: 'Sensor network ↔ cold-chain control', detail: 'Wireless refrigerator sensors report into the control service.', marker: 'TB3', location: 'X1' },
+  { id: 'store-cloud', name: 'Store ↔ head office', detail: 'Stock and loyalty data move between store systems and the head-office network.', marker: 'TB4', location: 'X3' },
 ] as const
 
 export type BoundaryId = (typeof trustBoundaries)[number]['id']
@@ -153,14 +153,14 @@ export const defenseBudget = 12
 export const strideRedoPenalty = 2
 export const maxAttackSelections = 3
 
-export const processNotes: { assetId: AssetId; subject: string; note: string }[] = [
-  { assetId: 'checkout', subject: 'STORE OPERATIONS', note: 'At staffed and self-service lanes, the register scans items, applies discounts, takes payment, and issues refunds. Card authorization is handled by an outside payment provider.' },
-  { assetId: 'cold-chain', subject: 'FOOD SAFETY', note: 'Refrigerator and freezer sensors report temperatures to a control service. Staff receive an alert when a case leaves its safe range.' },
-  { assetId: 'inventory', subject: 'SUPPLY & STOCK', note: 'Staff record deliveries and stock counts. Supplier systems send delivery updates, and the store service prepares replenishment orders for head office.' },
-  { assetId: 'loyalty', subject: 'CUSTOMER PROGRAM', note: 'The loyalty program stores member contact details and purchase history, applies member discounts at checkout, and syncs records with head office.' },
+export const componentNotes: { assetId: AssetId; subject: string; note: string; marker: string }[] = [
+  { assetId: 'checkout', subject: 'STORE OPERATIONS', note: 'At staffed and self-service lanes, the register scans items, applies discounts, takes payment, and issues refunds. Card authorization is handled by an outside payment provider.', marker: 'C1' },
+  { assetId: 'cold-chain', subject: 'FOOD SAFETY', note: 'Refrigerator and freezer sensors report temperatures to a control service. Staff receive an alert when a case leaves its safe range.', marker: 'C2' },
+  { assetId: 'inventory', subject: 'SUPPLY & STOCK', note: 'Staff record deliveries and stock counts. Supplier systems send delivery updates, and the store service prepares replenishment orders for head office.', marker: 'C3' },
+  { assetId: 'loyalty', subject: 'CUSTOMER PROGRAM', note: 'The loyalty program stores member contact details and purchase history, applies member discounts at checkout, and syncs records with head office.', marker: 'C4' },
 ]
 
-export const strideTargets: { id: StrideTargetId; name: string; kind: 'PROCESS' | 'BOUNDARY' }[] = [
-  ...assets.map(({ id, name }) => ({ id, name, kind: 'PROCESS' as const })),
+export const strideTargets: { id: StrideTargetId; name: string; kind: 'COMPONENT' | 'BOUNDARY' }[] = [
+  ...assets.map(({ id, name }) => ({ id, name, kind: 'COMPONENT' as const })),
   ...trustBoundaries.map(({ id, name }) => ({ id, name, kind: 'BOUNDARY' as const })),
 ]
