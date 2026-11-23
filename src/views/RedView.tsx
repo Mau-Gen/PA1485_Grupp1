@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useGame } from '../game/useGame'
-import { assets, vulnerabilities, type VulnerabilityId } from '../game/gameData'
+import { assets, maxAttackSelections, vulnerabilities, type VulnerabilityId } from '../game/gameData'
 
 type DesktopWindow = 'terminal' | VulnerabilityId
 
@@ -40,7 +40,7 @@ export default function RedView() {
       } else {
         discoverAssets()
         response = [
-          'Simulated ping sweep complete: isolated lab subnet 10.0.4.0/24.',
+          'Simulated ping sweep complete: isolated lab subnet 10.24.0.0/16.',
           ...assets.map(({ address, host }) => `${address}  ${host}  ONLINE`),
           'Run "scan <IP>" to check a discovered asset for potential vulnerabilities.',
         ]
@@ -82,11 +82,11 @@ export default function RedView() {
         response = ['Selection is locked after the preparation phase.']
       } else if (game.selectedAttacks.includes(item.id)) {
         response = [`${item.id} is already selected.`]
-      } else if (game.selectedAttacks.length >= 3) {
-        response = ['Selection limit reached: choose up to three briefings.']
+      } else if (game.selectedAttacks.length >= maxAttackSelections) {
+        response = [`Selection limit reached: choose up to ${maxAttackSelections} briefings.`]
       } else {
         selectAttack(item.id)
-        response = [`${item.id} / ${item.attackName} added to the operation plan.`, `${game.selectedAttacks.length + 1} of 3 selections used.`]
+        response = [`${item.id} / ${item.attackName} added to the operation plan.`, `${game.selectedAttacks.length + 1} of ${maxAttackSelections} selections used.`]
       }
     } else if (action === 'status') {
       response = [
@@ -190,7 +190,7 @@ export default function RedView() {
                 <div className="flex min-h-0 flex-1 flex-col border-2 border-t-[#777] border-l-[#777] border-b-white border-r-white bg-[#101010] p-3 text-[#a8f5a1]">
                   <div className="mb-2 flex shrink-0 items-center justify-between border-b border-[#315238] pb-2 text-[10px] text-[#a1cfa0]">
                     <span>{game.phase === 'preparation' ? 'ATTACK CATALOGUE' : 'ATTACK EXECUTION'}</span>
-                    <span>{game.selectedAttacks.length}/3 OPTIONS</span>
+                    <span>{game.selectedAttacks.length}/{maxAttackSelections} OPTIONS</span>
                   </div>
                   <div ref={terminalOutputRef} className="min-h-0 flex-1 space-y-1 overflow-y-auto text-xs leading-5" aria-live="polite">
                     {lines.map((line, index) => <p key={`${index}-${line}`} className={line.startsWith('red@') ? 'text-[#fff3bc]' : ''}>{line}</p>)}
@@ -253,11 +253,11 @@ export default function RedView() {
                       type="button"
                       onClick={() => {
                         if (selectAttack(currentBriefing.id)) {
-                          setLines((current) => [...current, `red@workstation:~$ select ${currentBriefing.id}`, `${currentBriefing.id} added to the attack plan.`, `${game.selectedAttacks.length + 1} of 3 selections used.`])
+                          setLines((current) => [...current, `red@workstation:~$ select ${currentBriefing.id}`, `${currentBriefing.id} added to the attack plan.`, `${game.selectedAttacks.length + 1} of ${maxAttackSelections} selections used.`])
                         }
                         setActiveWindow('terminal')
                       }}
-                      disabled={!game.discoveredVulnerabilities.includes(currentBriefing.id) || game.selectedAttacks.includes(currentBriefing.id) || game.phase !== 'preparation' || game.selectedAttacks.length >= 3}
+                      disabled={!game.discoveredVulnerabilities.includes(currentBriefing.id) || game.selectedAttacks.includes(currentBriefing.id) || game.phase !== 'preparation' || game.selectedAttacks.length >= maxAttackSelections}
                       className="mt-5 border-2 border-t-white border-l-white border-b-[#555] border-r-[#555] bg-[#c6c6c6] px-3 py-2 text-xs font-bold enabled:hover:bg-[#dedede] disabled:opacity-50"
                     >
                       {game.selectedAttacks.includes(currentBriefing.id) ? 'IN ATTACK PLAN' : game.phase === 'preparation' ? 'SELECT ATTACK OPTION' : 'ATTACK PLAN LOCKED'}
